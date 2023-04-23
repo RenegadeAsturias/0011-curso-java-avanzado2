@@ -1,0 +1,81 @@
+
+Curso Java Avanzado 2: Compilar y ejecutar módulos desde la línea de comandos
+
+// Compilar y ejecutar módulos desde la línea de comandos
+
+// Partimos de un proyecto Java dividido en tres módulos:
++ frases
++ utilidades
++ visualización
+
+// Y los tres módulos están dentro del directorio: 'src'
+
+// Si por ejemplo, exploramos el módulo: 'utilidades' tenemos
+
+src > utilidades > module-info.java
+
+// que contiene:
+
+module utilidades {
+	// El módulo: 'utilidades' solo exporta el paquete 'utils' al módulo: 'frases'
+	exports com.mparrastia.utils to frases; 
+	exports com.mparrastia.estructruas;
+}
+
+// dentro de la estructura de nuestros paquetes tenemos:
+
+src > utilidades > com > mparrastia > estructuras > Frase.java
+src > utilidades > com > mparrastia > utils > 
+
+
+// Empezamos con: javac
+
+// Con el parámetro '-d' indicamos el directorio donde irán las clases compiladas .class
+// Es decir: -d src/output
+
+// Como este proyecto tiene varios módulos debemos especificar el module-path:
+// Como nuestros módulos están en src: --module-source-path src
+
+// Ahora indicamos la clase que queremos compilar:
+// Así: src src/utilidades/com/mparrastia/estructuras/Frase.java
+
+// Y en la misma línea vamos a compilar su correspondiente módulo:
+// Así: src/utilidades/module-info.java
+
+// La línea de la compilación completa sería:
+javac -d src/output --module-source-path src/utilidades/com/mparrastia/estructuras/Frase.java src/utilizadades/module-info.java
+
+// Y ahora tendremos
++ frases
++ utilidades
++ visualización
++ src/output/utilidades/module-info.class
++ src/output/utilidades//com/mparrastia/estructuras/Frase.class
+
+
+// ***************************************************************************************
+// Ahora compilamos el resto de Clases y módulos
+
+
+// Las líneas completas de las compilaciones quedarían así:
+
+// Compilamos la clase: 'estructuras/Frase.java' y su módulo: 'utilidades/module-info.java'
+javac -d src/output --module-source-path src/utilidades/com/mparrastia/estructuras/Frase.java src/utilizadades/module-info.java
+
+// Compilamos la única clase del paquete utils: 'utils/GeneradorDeFrasesAleatorias.java'
+javac -d src/output --module-source-path src/utilidades/com/mparrastia/utils/GeneradorDeFrasesAleatorias.java
+
+// Compilamos la clase: 'frases/GestorFraseDelDia.java' y su módulo: 'frases/module-info.java'
+javac -d src/output --module-source-path src/frases/com/mparrastia/estructuras/Frase.java src/frases/module-info.java
+
+// Compilamos la única clase del paquete utils: 'utils/GeneradorDeFrasesAleatorias.java'
+javac -d src/output --module-source-path src/visualizacion/com/mparrastia/interfaz/Main.java src/visualizacion/module-info.java
+
+// Ya tenemos compilado todo nuestro proyecto
+// Ahora ejecutamos la clase Main para generar la frase del día
+// Y tenemos que indicar el module-path: --module-path src/output 
+// Y después indicamos el módulo de la clase que queremos ejecutar: --module visualizacion
+// Y seguido la clase que queremos ejecutar incluido el paquete: /com.mparrastia.interfaz.Main
+
+$ java --module-path src/output --module visualizacion/com.mparrastia.interfaz.Main
+
