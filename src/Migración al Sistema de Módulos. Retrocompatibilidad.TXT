@@ -1,0 +1,81 @@
+
+Migración al Sistema de Módulos. Retrocompatibilidad:
+
+En Java son conscientes de que es imposible modularizar todo un proyecto de una vez 
+y que por lo tanto durante un tiempo convivirá código modularizado y código que no.
+La primera forma en la que lo han afrontado es
+
++ El módulo sin nombre: Unnamed module
+
+1.- Todo el código que no forma parte de un módulo con nombre
+pasará a formar parte del módulo sin nombre: Unnamed module
+
+El módulo sin nombre tiene dos atributos:
+
+Atributo1: Exporta todos sus paquetes:
+Todos los paquetes que formen parte del mismo serán exportados automáticamente.
+
+Atributo2: Puede acceder al resto de módulos
+El módulo: Unnamed module podrá acceder al resto de módulos.
+
+2.-Class path en lugar de module path
+
+La segunda forma en la que se soporta el código Legacy a partir de Java 9 es usando
+el Class path en lugar del Module path
+igual que se ha venido haciendo tradicionalmente.
+Todo esto nos permite la transición a los módulos de forma gradual.
+
+A la hora de migrar nuestro proyecto podemos dividirla en tres capas:
+
+Capa1: El código propio: miapp
+
+Capa2: Las librerías de terceros: milib
+[libreria-externa-1.jar] + [libreria-externa-2.jar] + [libreria-externa-3.jar]
+
+Capa3: El JDK: El JDK ya está modularizado por lo tanto solo nos quedaría migrar las otras dos.
+[módulo: java.base] + [módulo: java.desktop] + [módulo: java.sql]
+
+Para migrar nuestro código vamos a necesitar conocer las dependencias entre nuestras clases.
+Existe una herramienta que se introdujo en Java 8 y fue mejorada en Java 9
+llamada JDeps y que nos puede ayudar a ello.
+
+Esta herramienta de análisis de dependencias de Java es una herramienta por línea de comandos
+que procesa el bytecode y analiza sus dependencias.
+
+Ejemplo de análisis de un jar que aún no ha sido modularizado:
+$ jdeps frases.jar
+
+1.-En la primera columna podemos ver nuestros paquetes.
+2.-En la segunda columna los paquetes de los que depende.
+3.-Y si los paquetes de la segunda columna pertenecen a un módulo
+se mostrarán en la tercera columna.
+
+Esto nos puede guiar a la hora de crear las nuestros módulos.
+Seleccionar que exportar de cada uno de ellos
+y añadir las dependencias que requieren
+
+
+#Principales problemas:
+
+Nuestros dos mayores problemas serán:
+1.-Las dependencias cíclicas
+Cuando el paquete A depende del paquete B y el paquete B depende del A.
+
+2.-Los paquetes divididos
+Cuando tenemos paquetes con el mismo nombre en diferentes librerías.
+
+En cuanto a las librerías de terceros no podemos hacer nada para modularizarlas
+ya que es una tarea que no depende de nosotros.
+Pero para poder incluirlas en nuestro proyecto modularizado
+podemos usar los módulos automáticos:
+
+Cuando ponemos un jar en el module path el sistema de módulos
+lo convertirá automáticamente en módulos.
+Y el nombre del módulo será obtenido del nombre del archivo jar.
+Exportará todos sus paquetes y requerirá todo el resto de módulos.
+Esto no es lo óptimo pero es lo que haría el class path.
+
+Con esto ya tendríamos todo nuestro proyecto migrado al sistema de módulos de Java
+y podremos beneficiarnos de la mejora en organización y encapsulación
+que esto nos ofrece.
+
